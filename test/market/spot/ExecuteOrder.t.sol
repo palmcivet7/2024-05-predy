@@ -48,6 +48,29 @@ contract TestSpotExecuteOrder is TestSpotMarket {
             1000,
             1100,
             0,
+            // q what is the AuctionParams data being used for?
+            abi.encode(SpotMarket.AuctionParams(1000, 1001, block.timestamp - 1 minutes, block.timestamp + 4 minutes))
+        );
+
+        IFillerMarket.SignedOrder memory signedOrder = _createSignedOrder(order, fromPrivateKey1);
+
+        int256 quoteTokenAmount = spotMarket.executeOrder(signedOrder, _getSpotSettlementParams(1000, 1000));
+
+        assertEq(quoteTokenAmount, -1000);
+
+        _checkBalances();
+    }
+
+    function testExecuteOrderSucceedsForSwap2() public {
+        address misc = makeAddr("misc");
+
+        SpotOrder memory order = SpotOrder(
+            OrderInfo(address(spotMarket), from1, 0, block.timestamp + 100),
+            address(currency1),
+            address(currency0),
+            1000,
+            1100,
+            0,
             abi.encode(SpotMarket.AuctionParams(1000, 1001, block.timestamp - 1 minutes, block.timestamp + 4 minutes))
         );
 

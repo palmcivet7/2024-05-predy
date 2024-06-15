@@ -116,7 +116,7 @@ library Reallocation {
         } else if (result > TickMath.MAX_TICK) {
             result = TickMath.MAX_TICK;
         }
-
+        // @audit-followup divide before multiply
         result = (result / tickSpacing) * tickSpacing;
     }
 

@@ -50,8 +50,10 @@ contract PriceFeed {
         require(basePrice.expo == -8, "INVALID_EXP");
 
         require(quoteAnswer > 0 && basePrice.price > 0);
-
+        // @audit-followup divide before multiply
+        // https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
         uint256 price = uint256(int256(basePrice.price)) * Constants.Q96 / uint256(quoteAnswer);
+        // @audit-followup divide before multiply
         price = price * Constants.Q96 / _decimalsDiff;
 
         sqrtPrice = FixedPointMathLib.sqrt(price);

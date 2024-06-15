@@ -26,6 +26,7 @@ library TradeLogic {
         int256 fee
     );
 
+    // @audit-followup no access control or reentrant protection
     function trade(
         GlobalDataLibrary.GlobalData storage globalData,
         IPredyPool.TradeParams memory tradeParams,

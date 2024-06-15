@@ -66,6 +66,7 @@ contract GammaTradeMarket is IFillerMarket, BaseMarketUpgradable, ReentrancyGuar
 
     constructor() {}
 
+    // @audit initialize // executed in deploy script same tx
     function initialize(IPredyPool predyPool, address permit2Address, address whitelistFiller, address quoterAddress)
         public
         initializer
@@ -142,13 +143,14 @@ contract GammaTradeMarket is IFillerMarket, BaseMarketUpgradable, ReentrancyGuar
     ) external override returns (IPredyPool.TradeResult memory tradeResult) {
         tradeResult =
             _predyPool.execLiquidationCall(vaultId, closeRatio, _getSettlementDataFromV3(settlementParams, msg.sender));
-
+        // @audit-followup strict equality
         if (closeRatio == 1e18) {
             _removePosition(vaultId);
         }
     }
 
     // open position
+    // nonReentrant
     function _executeTrade(GammaOrder memory gammaOrder, bytes memory sig, SettlementParamsV3 memory settlementParams)
         internal
         returns (IPredyPool.TradeResult memory tradeResult)
@@ -208,13 +210,14 @@ contract GammaTradeMarket is IFillerMarket, BaseMarketUpgradable, ReentrancyGuar
         );
     }
 
+    // @audit-followup reentrant?
     function _modifyAutoHedgeAndClose(GammaOrder memory gammaOrder, bytes memory sig) internal {
         if (gammaOrder.quantity != 0 || gammaOrder.quantitySqrt != 0 || gammaOrder.marginAmount != 0) {
             revert InvalidOrder();
         }
 
         ResolvedOrder memory resolvedOrder = GammaOrderLib.resolve(gammaOrder, sig);
-
+        // @audit reentrancy
         _verifyOrder(resolvedOrder);
 
         // save user position

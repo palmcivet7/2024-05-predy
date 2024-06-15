@@ -11,6 +11,7 @@ import {IFillerMarket} from "../interfaces/IFillerMarket.sol";
  * @notice Quoter contract for GammaTradeMarket
  */
 contract GammaTradeMarketQuoter {
+    // @audit-info should be immutable
     GammaTradeMarket public gammaTradeMarket;
 
     constructor(GammaTradeMarket _gammaTradeMarket) {

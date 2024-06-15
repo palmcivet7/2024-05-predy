@@ -70,6 +70,7 @@ contract GammaTradeMarketL2 is GammaTradeMarket {
     }
 
     // modify position (hedge or close)
+    // @audit-followup reentrant? https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
     function modifyAutoHedgeAndClose(GammaModifyOrderL2 memory order, bytes memory sig) external {
         GammaModifyInfo memory modifyInfo =
             L2GammaDecoder.decodeGammaModifyInfo(order.param, order.lowerLimit, order.upperLimit, order.maximaDeviation);

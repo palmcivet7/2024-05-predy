@@ -14,8 +14,9 @@ import {SupplyToken} from "../../tokenization/SupplyToken.sol";
 import {GlobalDataLibrary} from "../../types/GlobalData.sol";
 
 library AddPairLogic {
+    // q what are all of these params?
     struct AddPairParams {
-        address quoteToken;
+        address quoteToken; // e stablecoin ie usdc, dai, usdt
         address poolOwner;
         address uniswapPool;
         address priceFeed;
@@ -25,6 +26,22 @@ library AddPairLogic {
         InterestRateModel.IRMParams quoteIrmParams;
         InterestRateModel.IRMParams baseIrmParams;
     }
+    // AssetRiskParams:
+    // struct AssetRiskParams {
+    //     uint128 riskRatio;
+    //     uint128 debtRiskRatio;
+    //     int24 rangeSize;
+    //     int24 rebalanceThreshold;
+    //     uint64 minSlippage;
+    //     uint64 maxSlippage;
+    // }
+    // IRMParams:
+    // struct IRMParams {
+    //     uint256 baseRate;
+    //     uint256 kinkRate;
+    //     uint256 slope1;
+    //     uint256 slope2;
+    // }
 
     error InvalidUniswapPool();
 
@@ -73,6 +90,7 @@ library AddPairLogic {
             revert InvalidUniswapPool();
         }
 
+        // e reverts if the quoteToken stablecoin isnt one of the tokens in the uni pool
         require(uniswapPool.token0() == stableTokenAddress || uniswapPool.token1() == stableTokenAddress, "C3");
 
         bool isQuoteZero = uniswapPool.token0() == stableTokenAddress;

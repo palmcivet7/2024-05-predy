@@ -136,6 +136,80 @@ contract TestPerpExecuteOrderV3 is TestPerpMarket {
         assertEq(balance2 - balance1, 1998997);
     }
 
+    function testExecuteOrderV3SucceedsForOpen2() public {
+        uint256 balance0 = currency1.balanceOf(from1);
+
+        {
+            PerpOrderV3 memory order = PerpOrderV3(
+                OrderInfo(address(perpMarket), from1, 0, block.timestamp + 100),
+                1,
+                address(currency1),
+                "buy", // changed from sell
+                2 * 1e6,
+                2 * 1e6 * 101 / 100,
+                0,
+                0,
+                1,
+                false,
+                false,
+                abi.encode(PerpMarketLib.AuctionParams(0, 0, 0, 0))
+            );
+
+            IFillerMarket.SignedOrder memory signedOrder = _createSignedOrder(order, fromPrivateKey1);
+
+            IFillerMarket.SettlementParamsV3 memory settlementData = _getUniSettlementDataV3(0);
+
+            vm.startPrank(from1);
+            vm.expectRevert(IFillerMarket.CallerIsNotFiller.selector);
+            perpMarket.executeOrderV3(signedOrder, settlementData);
+            vm.stopPrank();
+
+            IPredyPool.TradeResult memory tradeResult = perpMarket.executeOrderV3(signedOrder, settlementData);
+
+            assertEq(tradeResult.payoff.perpEntryUpdate, 1998999);
+            assertEq(tradeResult.payoff.sqrtEntryUpdate, 0);
+            assertEq(tradeResult.payoff.perpPayoff, 0);
+            assertEq(tradeResult.payoff.sqrtPayoff, 0);
+        }
+
+        uint256 balance1 = currency1.balanceOf(from1);
+
+        // Close position by trader
+        {
+            PerpOrderV3 memory order = PerpOrderV3(
+                OrderInfo(address(perpMarket), from1, 1, block.timestamp + 100),
+                1,
+                address(currency1),
+                "Buy",
+                2 * 1e6,
+                0,
+                0,
+                0,
+                2,
+                false,
+                false,
+                abi.encode(PerpMarketLib.AuctionParams(2 * Constants.Q96, 2 * Constants.Q96, 0, 0))
+            );
+
+            IFillerMarket.SignedOrder memory signedOrder = _createSignedOrder(order, fromPrivateKey1);
+
+            vm.startPrank(from1);
+            IPredyPool.TradeResult memory tradeResult2 =
+                perpMarket.executeOrderV3(signedOrder, _getUniSettlementDataV3(MIN_QUOTE_PRICE));
+            vm.stopPrank();
+
+            assertEq(tradeResult2.payoff.perpEntryUpdate, -1998999);
+            assertEq(tradeResult2.payoff.sqrtEntryUpdate, 0);
+            assertEq(tradeResult2.payoff.perpPayoff, -2004);
+            assertEq(tradeResult2.payoff.sqrtPayoff, 0);
+        }
+
+        uint256 balance2 = currency1.balanceOf(from1);
+
+        assertEq(balance0 - balance1, 2001001);
+        assertEq(balance2 - balance1, 1998997);
+    }
+
     // reduce and increase position
     function testExecuteOrderV3SucceedsWithReducingAndIncreasing() public {
         uint256 balance0 = currency1.balanceOf(from1);

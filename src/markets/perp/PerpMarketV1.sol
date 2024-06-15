@@ -33,8 +33,9 @@ contract PerpMarketV1 is BaseMarketUpgradable, ReentrancyGuardUpgradeable {
     using SafeTransferLib for ERC20;
     using SafeCast for uint256;
 
+    // @audit-info unused error
     error TPSLConditionDoesNotMatch();
-
+    // @audit-info unused error
     error UpdateMarginMustNotBePositive();
 
     error AmountIsZero();
@@ -76,6 +77,7 @@ contract PerpMarketV1 is BaseMarketUpgradable, ReentrancyGuardUpgradeable {
         int256 fee,
         int256 marginAmount
     );
+    // q what is payoff?
     event PerpTraded2(
         address indexed trader,
         uint256 pairId,

@@ -2,12 +2,14 @@
 pragma solidity >=0.8.0;
 
 interface IFillerMarket {
+    // @audit-info unused error
     error SignerIsNotVaultOwner();
 
     error CallerIsNotFiller();
 
     error SettlementContractIsNotWhitelisted();
 
+    // e this is the SignedOrder
     struct SignedOrder {
         bytes order;
         bytes sig;

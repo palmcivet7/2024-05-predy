@@ -12,6 +12,7 @@ import {IFillerMarket} from "../interfaces/IFillerMarket.sol";
  * @notice Quoter contract for PerpMarket
  */
 contract PerpMarketQuoter {
+    // @audit-info should be immutable
     PerpMarket public perpMarket;
 
     constructor(PerpMarket _perpMarket) {

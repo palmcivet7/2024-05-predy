@@ -67,6 +67,8 @@ contract PredyPool is IPredyPool, IUniswapV3MintCallback, Initializable, Reentra
 
     constructor() {}
 
+    // @acknowledged initialize attack?
+    // yes, but the deploy script calls this in the same tx as deployment
     function initialize(address uniswapFactory) public initializer {
         __ReentrancyGuard_init();
         AddPairLogic.initializeGlobalData(globalData, uniswapFactory);
@@ -106,6 +108,7 @@ contract PredyPool is IPredyPool, IUniswapV3MintCallback, Initializable, Reentra
      * @param addPairParam AddPairParams struct containing pair information.
      * @return pairId The id of the pair.
      */
+    // e the guy in code4rena discord said this would be callable by anyone
     function registerPair(AddPairLogic.AddPairParams memory addPairParam) external onlyOperator returns (uint256) {
         return AddPairLogic.addPair(globalData, allowedUniswapPools, addPairParam);
     }
@@ -224,6 +227,7 @@ contract PredyPool is IPredyPool, IUniswapV3MintCallback, Initializable, Reentra
         nonReentrant
         returns (uint256 finalSuppliedAmount)
     {
+        // e supply tokens get minted here
         return SupplyLogic.supply(globalData, pairId, supplyAmount, isQuoteAsset);
     }
 
@@ -283,6 +287,7 @@ contract PredyPool is IPredyPool, IUniswapV3MintCallback, Initializable, Reentra
      * @param vaultId The id of the vault.
      * @param recipient if recipient is zero address, protocol never transfers margin.
      */
+    // q what is a vault?
     function updateRecepient(uint256 vaultId, address recipient) external onlyVaultOwner(vaultId) {
         DataType.Vault storage vault = globalData.vaults[vaultId];
 
@@ -334,6 +339,7 @@ contract PredyPool is IPredyPool, IUniswapV3MintCallback, Initializable, Reentra
      * @notice Creates a new vault
      * @param pairId The id of pair to create vault
      */
+    // @audit unprotected external function
     function createVault(uint256 pairId) external returns (uint256) {
         globalData.validate(pairId);
 
@@ -367,6 +373,7 @@ contract PredyPool is IPredyPool, IUniswapV3MintCallback, Initializable, Reentra
 
     /// @notice Gets the status of pair
     /// @dev This function always reverts
+    // @audit reentrancy DoS
     function revertPairStatus(uint256 pairId) external {
         ReaderLogic.getPairStatus(globalData, pairId);
     }

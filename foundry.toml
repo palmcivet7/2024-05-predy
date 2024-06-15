@@ -2,6 +2,11 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+remappings  = [
+    "@solmate=lib/solmate",
+    "@uniswap/permit2=lib/permit2",
+    "@uniswap/v3-core=lib/v3-core"
+]
 
 optimizer = true
 via_ir = false
@@ -12,4 +17,5 @@ gas_reports = ["*"]
 fs_permissions = [{ access = "read", path = "./"}]
 
 [fuzz]
-runs = 1024
+runs = 10240
+

@@ -20,6 +20,7 @@ abstract contract BaseMarketUpgradable is IFillerMarket, BaseHookCallbackUpgrada
         uint256 minFee;
     }
 
+    // q who is this role? what is it for?
     address public whitelistFiller;
 
     PredyPoolQuoter internal _quoter;
@@ -55,6 +56,7 @@ abstract contract BaseMarketUpgradable is IFillerMarket, BaseHookCallbackUpgrada
         SettlementCallbackLib.SettlementParams memory settlementParams = decodeParamsV3(settlementData, baseAmountDelta);
 
         SettlementCallbackLib.validate(_whiteListedSettlements, settlementParams);
+        // @audit arbitrary send from
         SettlementCallbackLib.execSettlement(_predyPool, quoteToken, baseToken, settlementParams, baseAmountDelta);
     }
 
@@ -126,6 +128,8 @@ abstract contract BaseMarketUpgradable is IFillerMarket, BaseHookCallbackUpgrada
      * @dev only owner can call this function
      */
     function updateWhitelistFiller(address newWhitelistFiller) external onlyFiller {
+        // @audit-low should emit event
+        // https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
         whitelistFiller = newWhitelistFiller;
     }
 
@@ -142,6 +146,7 @@ abstract contract BaseMarketUpgradable is IFillerMarket, BaseHookCallbackUpgrada
     }
 
     /// @notice Registers quote token address for the pair
+    // q should this have access control????
     function updateQuoteTokenMap(uint256 pairId) external {
         if (_quoteTokenMap[pairId] == address(0)) {
             _quoteTokenMap[pairId] = _getQuoteTokenAddress(pairId);

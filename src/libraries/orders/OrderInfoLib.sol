@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
+// q what are market and trader? is trader the msg.sender?? is market spot/perp/gamma?
+// a yes, it appears to be. see test/market/spot/ExecuteOrder.t.sol
 struct OrderInfo {
     address market;
     address trader;

@@ -6,20 +6,30 @@ import {IFillerMarket} from "../../interfaces/IFillerMarket.sol";
 import {IPredyPool} from "../../interfaces/IPredyPool.sol";
 import {ResolvedOrder} from "../../libraries/orders/ResolvedOrder.sol";
 
+// e OrderInfo is:
+// address market; spot/perp/gamma
+// address trader; user
+// uint256 nonce;
+// uint256 deadline;
 struct PerpOrderV3 {
     OrderInfo info;
-    uint64 pairId;
-    address entryTokenAddress;
-    string side;
+    uint64 pairId; // pairId returned by `PredyPool::registerPair` ?
+    address entryTokenAddress; // one of the tokens being used. the one the trader is providing?
+    string side; // buy or sell ?
     uint256 quantity;
     uint256 marginAmount;
     uint256 limitPrice;
     uint256 stopPrice;
     uint8 leverage;
-    bool reduceOnly;
-    bool closePosition;
-    bytes auctionData;
+    bool reduceOnly; // true if reducing an already open position ?
+    bool closePosition; // true if closing an already open position ?
+    bytes auctionData; // abi.encode(PerpMarketLib.AuctionParams(0, 0, 0, 0))
 }
+// e AuctionParams :
+//     uint256 startPrice;
+//     uint256 endPrice;
+//     uint256 startTime;
+//     uint256 endTime;
 
 /// @notice helpers for handling general order objects
 library PerpOrderV3Lib {

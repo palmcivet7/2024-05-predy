@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
+// @audit-info unused import
 import "../interfaces/IPredyPool.sol";
 
 library LockDataLibrary {

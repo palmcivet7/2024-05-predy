@@ -71,7 +71,7 @@ library GammaTradeMarketLib {
                     userPosition.lastHedgedTime + userPosition.hedgeInterval,
                     block.timestamp,
                     userPosition.auctionParams
-                    ),
+                ),
                 GammaTradeMarketLib.CallbackType.HEDGE_BY_TIME
             );
         }
@@ -152,7 +152,7 @@ library GammaTradeMarketLib {
         if (elapsed > Bps.ONE) {
             return auctionParams.maxSlippageTolerance;
         }
-
+        // @audit-followup divide before multiply
         return (
             auctionParams.minSlippageTolerance
                 + elapsed * (auctionParams.maxSlippageTolerance - auctionParams.minSlippageTolerance) / Bps.ONE

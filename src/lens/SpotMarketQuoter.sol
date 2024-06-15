@@ -10,6 +10,7 @@ import {IFillerMarket} from "../interfaces/IFillerMarket.sol";
  * @notice Quoter contract for SpotMarket
  */
 contract SpotMarketQuoter {
+    // @audit-info should be immutable
     ISpotMarket spotMarket;
 
     constructor(ISpotMarket _spotMarket) {

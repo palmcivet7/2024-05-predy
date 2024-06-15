@@ -17,6 +17,8 @@ abstract contract BaseHookCallbackUpgradable is Initializable, IHooks {
         _;
     }
 
+    // @audit initialize attack?
+    // q where does this get called?
     function __BaseHookCallback_init(IPredyPool predyPool) internal onlyInitializing {
         _predyPool = predyPool;
     }

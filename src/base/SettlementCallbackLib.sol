@@ -9,6 +9,7 @@ import {Constants} from "../libraries/Constants.sol";
 import {Math} from "../libraries/math/Math.sol";
 import {IFillerMarket} from "../interfaces/IFillerMarket.sol";
 
+// @audit-info lack of natspec
 library SettlementCallbackLib {
     using SafeTransferLib for ERC20;
     using Math for uint256;
@@ -45,6 +46,9 @@ library SettlementCallbackLib {
         int256 baseAmountDelta
     ) internal {
         if (settlementParams.fee < 0) {
+            // @audit-high abitrary `from` in transferFrom
+            // q if its just transferring to address(predyPool), is it really an issue?
+            // @audit doesnt check return value?
             ERC20(quoteToken).safeTransferFrom(
                 settlementParams.sender, address(predyPool), uint256(-settlementParams.fee)
             );
@@ -101,13 +105,14 @@ library SettlementCallbackLib {
             uint256 quoteAmount = sellAmount * price / Constants.Q96;
 
             predyPool.take(false, sender, sellAmount);
-
+            // @audit-high abitrary `from` in transferFrom
             ERC20(quoteToken).safeTransferFrom(sender, address(predyPool), quoteAmount);
 
             return;
         }
 
         predyPool.take(false, address(this), sellAmount);
+        // @audit ignores return value by ERC20(baseToken)
         ERC20(baseToken).approve(address(settlementParams.contractAddress), sellAmount);
 
         uint256 quoteAmountFromUni = ISettlement(settlementParams.contractAddress).swapExactIn(
@@ -125,6 +130,7 @@ library SettlementCallbackLib {
             uint256 quoteAmount = sellAmount * price / Constants.Q96;
 
             if (quoteAmount > quoteAmountFromUni) {
+                // @audit-high abitrary `from` in transferFrom
                 ERC20(quoteToken).safeTransferFrom(sender, address(this), quoteAmount - quoteAmountFromUni);
             } else if (quoteAmountFromUni > quoteAmount) {
                 ERC20(quoteToken).safeTransfer(sender, quoteAmountFromUni - quoteAmount);
@@ -148,7 +154,7 @@ library SettlementCallbackLib {
             uint256 quoteAmount = buyAmount * price / Constants.Q96;
 
             predyPool.take(true, sender, quoteAmount);
-
+            // @audit-high abitrary `from` in transferFrom
             ERC20(baseToken).safeTransferFrom(sender, address(predyPool), buyAmount);
 
             return;
@@ -172,8 +178,10 @@ library SettlementCallbackLib {
             uint256 quoteAmount = buyAmount * price / Constants.Q96;
 
             if (quoteAmount > quoteAmountToUni) {
+                // @audit-high abitrary `from` in transferFrom
                 ERC20(quoteToken).safeTransfer(sender, quoteAmount - quoteAmountToUni);
             } else if (quoteAmountToUni > quoteAmount) {
+                // @audit-high abitrary `from` in transferFrom
                 ERC20(quoteToken).safeTransferFrom(sender, address(this), quoteAmountToUni - quoteAmount);
             }
 

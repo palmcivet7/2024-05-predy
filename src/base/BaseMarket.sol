@@ -34,6 +34,7 @@ abstract contract BaseMarket is IFillerMarket, BaseHookCallback, Owned {
         SettlementCallbackLib.SettlementParams memory settlementParams =
             SettlementCallbackLib.decodeParams(settlementData);
         SettlementCallbackLib.validate(_whiteListedSettlements, settlementParams);
+        // @audit arbitrary send from
         SettlementCallbackLib.execSettlement(_predyPool, quoteToken, baseToken, settlementParams, baseAmountDelta);
     }
 

@@ -10,6 +10,7 @@ import {SpotOrder, SpotOrderLib} from "../../../src/markets/spot/SpotOrder.sol";
 import "../../../src/libraries/Constants.sol";
 import {SigUtils} from "../../utils/SigUtils.sol";
 import {OrderValidatorUtils} from "../../utils/OrderValidatorUtils.sol";
+// import {Permit2} from "@uniswap/permit2/src/Permit2.sol";
 
 contract TestSpotMarket is TestPool, SigUtils, OrderValidatorUtils {
     using SpotOrderLib for SpotOrder;

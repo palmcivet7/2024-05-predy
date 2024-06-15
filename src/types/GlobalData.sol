@@ -13,6 +13,7 @@ library GlobalDataLibrary {
     using SafeTransferLib for ERC20;
     using SafeCast for uint256;
 
+    // q what is this GlobalData struct?
     struct GlobalData {
         uint256 pairsCount;
         uint256 vaultCount;
@@ -22,6 +23,13 @@ library GlobalDataLibrary {
         mapping(uint256 => DataType.Vault) vaults;
         LockDataLibrary.LockData lockData;
     }
+    // LockData:
+    // struct LockData {
+    //     address locker;
+    //     uint256 quoteReserve;
+    //     uint256 baseReserve;
+    //     uint256 pairId;
+    // }
 
     function validateVaultId(GlobalDataLibrary.GlobalData storage globalData, uint256 vaultId) internal view {
         if (vaultId <= 0 || globalData.vaultCount <= vaultId) revert IPredyPool.InvalidPairId();

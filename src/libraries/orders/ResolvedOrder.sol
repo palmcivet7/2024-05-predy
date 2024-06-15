@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import {OrderInfo} from "./OrderInfoLib.sol";
 
+// @audit order.sig is here
 struct ResolvedOrder {
     OrderInfo info;
     address token;

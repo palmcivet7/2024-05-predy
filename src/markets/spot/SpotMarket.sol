@@ -42,6 +42,7 @@ contract SpotMarket is IFillerMarket, ISpotMarket, Owned {
         address baseToken;
     }
 
+    // q what are the AuctionParams being used for?
     struct AuctionParams {
         uint256 startAmount;
         uint256 endAmount;
@@ -59,8 +60,11 @@ contract SpotMarket is IFillerMarket, ISpotMarket, Owned {
         address validatorAddress
     );
 
+    // q what is permit?
     IPermit2 private immutable _permit2;
 
+    // xq what is LockData?
+    // a struct containing quoteToken and baseToken addresses
     LockData private lockData;
 
     mapping(address settlementContractAddress => bool) internal _whiteListedSettlements;
@@ -77,6 +81,7 @@ contract SpotMarket is IFillerMarket, ISpotMarket, Owned {
         _whiteListedSettlements[settlementContractAddress] = isEnabled;
     }
 
+    // q can we sign tx offline, passing signature along with trade/order details to gas grief?
     /**
      * @notice Verifies signature of the order and open new predict position
      * @param order The order signed by trader
@@ -86,11 +91,13 @@ contract SpotMarket is IFillerMarket, ISpotMarket, Owned {
         external
         returns (int256 quoteTokenAmount)
     {
+        // e order.order is SpotOrder inside SignedOrder
         SpotOrder memory spotOrder = abi.decode(order.order, (SpotOrder));
-
+        // @audit start of arb from send?
         return _executeOrder(spotOrder, order.sig, settlementParams);
     }
 
+    // e this is where externally provided user data will be going
     function _executeOrder(SpotOrder memory spotOrder, bytes memory sig, SettlementParams memory settlementParams)
         internal
         returns (int256 quoteTokenAmount)
@@ -124,7 +131,7 @@ contract SpotMarket is IFillerMarket, ISpotMarket, Owned {
         if (baseTokenAmount > 0) {
             TransferHelper.safeTransfer(spotOrder.baseToken, spotOrder.info.trader, uint256(baseTokenAmount));
         }
-
+        // @audit-info CEI
         emit SpotTraded(
             spotOrder.info.trader,
             msg.sender,
@@ -207,12 +214,13 @@ contract SpotMarket is IFillerMarket, ISpotMarket, Owned {
         internal
         returns (int256)
     {
+        // q what are the quote and base tokens?
         uint256 quoteReserve = ERC20(spotOrder.quoteToken).balanceOf(address(this));
         uint256 baseReserve = ERC20(spotOrder.baseToken).balanceOf(address(this));
 
         lockData.quoteToken = spotOrder.quoteToken;
         lockData.baseToken = spotOrder.baseToken;
-
+        // @audit arb send from
         _execSettlement(spotOrder.quoteToken, spotOrder.baseToken, settlementParams, -totalBaseAmount);
 
         uint256 afterQuoteReserve = ERC20(spotOrder.quoteToken).balanceOf(address(this));
